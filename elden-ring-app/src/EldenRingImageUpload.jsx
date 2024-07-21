@@ -5,7 +5,11 @@ import { Button } from './components/ui/button';
 
 const EldenRingImageUpload = () => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [responseData, setResponseData] = useState(null);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -18,12 +22,53 @@ const EldenRingImageUpload = () => {
     }
   };
 
-  const handleUpload = () => {
-    if (selectedImage) {
-      console.log('Offering image to the Erdtree:', selectedImage.name);
-      setSelectedImage(null);
+  const handleMessageChange = (e) => {
+    setMessage(e.target.value);
+  };
+
+  const handleUpload = async () => {
+    if (selectedImage && message) {
+      setIsUploading(true);
+      setError('');
+      setSuccess('');
+      setResponseData(null);
+
+      try {
+        const formData = new FormData();
+        formData.append('image', selectedImage);
+        formData.append('message', message);
+
+        const response = await fetch('http://localhost:3001/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to upload to the Erdtree');
+        }
+
+        const result = await response.json();
+        console.log('Offering accepted by the Erdtree:', result);
+        
+        setResponseData(result);
+        setSuccess(`Your offering has been accepted by the Erdtree, Tarnished. 
+          Image saved as: ${result.imageName}
+          Message saved as: ${result.textName}
+          ${result.customMessage}`);
+
+        setSelectedImage(null);
+        setMessage('');
+      } catch (err) {
+        console.error('Error offering to the Erdtree:', err);
+        setError('The Erdtree rejected your offering. Please try again, Tarnished.');
+      } finally {
+        setIsUploading(false);
+      }
+    } else {
+      setError('Tarnished, both an image and a message are required for the offering.');
     }
   };
+
 
   const styles = {
     container: {
@@ -77,6 +122,18 @@ const EldenRingImageUpload = () => {
     },
     offerButtonHover: {
       backgroundColor: '#c7a767'
+    },
+    messageInput: {
+      width: '100%',
+      marginTop: '1rem',
+      padding: '0.75rem',
+      backgroundColor: '#1c1609',
+      color: '#e6d2a8',
+      border: '2px solid #c7a767',
+      borderRadius: '0.375rem',
+      fontFamily: 'Cinzel, serif',
+      fontSize: '1rem',
+      outline: 'none',
     }
   };
 
@@ -100,10 +157,24 @@ const EldenRingImageUpload = () => {
         </div>
       </div>
 
+      <input
+        type="text"
+        placeholder="Enter your message for the Erdtree..."
+        value={message}
+        onChange={handleMessageChange}
+        style={styles.messageInput}
+      />
+
       {error && (
         <Alert variant="destructive" style={{marginBottom: '1rem', backgroundColor: '#4f1c1c', border: '1px solid #8b0000', color: '#ffa799'}}>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
+      )}
+
+      {success && (
+        <div style={styles.successMessage}>
+          {success}
+        </div>
       )}
 
       {selectedImage && (
@@ -120,13 +191,21 @@ const EldenRingImageUpload = () => {
 
       <Button
         onClick={handleUpload}
-        disabled={!selectedImage}
+        disabled={!selectedImage || !message || isUploading}
         style={styles.offerButton}
       >
-        Offer to the Erdtree
+        {isUploading ? 'Offering to the Erdtree...' : 'Offer to the Erdtree'}
       </Button>
+
+      {responseData && (
+        <div style={styles.responseData}>
+          <h3>Response from the Erdtree:</h3>
+          <pre>{JSON.stringify(responseData, null, 2)}</pre>
+        </div>
+      )}
     </div>
   );
 };
 
 export default EldenRingImageUpload;
+
