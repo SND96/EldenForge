@@ -130,3 +130,9 @@ dist
 .pnp.*
 
 elden-ring-app/node_modules/*
+
+# Exclude CSV, faiss, and pkl files
+*.csv
+*.faiss
+*.pkl
+*.html
