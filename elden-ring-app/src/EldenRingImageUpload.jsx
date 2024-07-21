@@ -5,6 +5,7 @@ import { Button } from './components/ui/button';
 
 const EldenRingImageUpload = () => {
   const [selectedImage, setSelectedImage] = useState(null);
+  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   const handleImageChange = (e) => {
@@ -18,10 +19,18 @@ const EldenRingImageUpload = () => {
     }
   };
 
+  const handleMessageChange = (e) => {
+    setMessage(e.target.value);
+  };
+
   const handleUpload = () => {
-    if (selectedImage) {
+    if (selectedImage && message) {
       console.log('Offering image to the Erdtree:', selectedImage.name);
+      console.log('Message:', message);
       setSelectedImage(null);
+      setMessage('');
+    } else {
+      setError('Tarnished, both an image and a message are required for the offering.');
     }
   };
 
@@ -77,6 +86,18 @@ const EldenRingImageUpload = () => {
     },
     offerButtonHover: {
       backgroundColor: '#c7a767'
+    },
+    messageInput: {
+      width: '100%',
+      marginTop: '1rem',
+      padding: '0.75rem',
+      backgroundColor: '#1c1609',
+      color: '#e6d2a8',
+      border: '2px solid #c7a767',
+      borderRadius: '0.375rem',
+      fontFamily: 'Cinzel, serif',
+      fontSize: '1rem',
+      outline: 'none',
     }
   };
 
@@ -100,6 +121,14 @@ const EldenRingImageUpload = () => {
         </div>
       </div>
 
+      <input
+        type="text"
+        placeholder="Enter your message for the Erdtree..."
+        value={message}
+        onChange={handleMessageChange}
+        style={styles.messageInput}
+      />
+
       {error && (
         <Alert variant="destructive" style={{marginBottom: '1rem', backgroundColor: '#4f1c1c', border: '1px solid #8b0000', color: '#ffa799'}}>
           <AlertDescription>{error}</AlertDescription>
@@ -120,7 +149,7 @@ const EldenRingImageUpload = () => {
 
       <Button
         onClick={handleUpload}
-        disabled={!selectedImage}
+        disabled={!selectedImage || !message}
         style={styles.offerButton}
       >
         Offer to the Erdtree
