@@ -2,6 +2,7 @@ import requests
 import json
 import base64
 import argparse
+import cohere
 from tenacity import retry, stop_after_attempt, wait_random_exponential, retry_if_exception_type
 
 # OpenAI API Key
@@ -10,6 +11,7 @@ HEADERS = {
     "Authorization": f"Bearer {OPENAI_API_KEY}",
     "Content-Type": "application/json"
 }
+COHERE_API_KEY = "h1XkPfFdekjbWlPdK8kTG1VFCy4gjBDDYpa5KpY2"
 
 class RateLimitError(Exception):
     pass
@@ -121,9 +123,25 @@ def main():
             results = response.json()
             with open('index_querier/results.json', 'w') as f:
                 json.dump(results, f, indent=4)
+            
+            co = cohere.Client(COHERE_API_KEY)
+            docs = list(set(results['results']))
 
+            response = co.rerank(
+                model="rerank-english-v3.0",
+                query=query,
+                documents=docs,
+                top_n=3
+                )
+            
+            top_indices = [result["index"] for result in json.loads(response.json())["results"]]
+            top_docs = [docs[index] for index in top_indices]
+            top_results = {"results": top_docs}
+            with open('index_querier/top_results.json', 'w') as f:
+                json.dump(top_results, f, indent=4)
+            
             framed_question = query
-            answer = submit_query_to_gpt4('index_querier/results.json', framed_question)
+            answer = submit_query_to_gpt4('index_querier/top_results.json', framed_question)
             print("\nGPT-4 Response:\n")
             print(answer)
             print('\n')
