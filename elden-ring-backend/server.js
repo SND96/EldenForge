@@ -3,6 +3,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
+const { spawn } = require('child_process');
 
 const app = express();
 const port = 3001;
@@ -23,6 +24,31 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+function runPythonScript(message) {
+  return new Promise((resolve, reject) => {
+    const pythonProcess = spawn('python', ['query_index.py', '--query', message]);
+    
+    let scriptOutput = '';
+    let scriptError = '';
+
+    pythonProcess.stdout.on('data', (data) => {
+      scriptOutput += data.toString();
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      scriptError += data.toString();
+    });
+
+    pythonProcess.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(`Python script exited with code ${code}. Error: ${scriptError}`));
+      } else {
+        resolve(scriptOutput.trim());
+      }
+    });
+  });
+}
+
 app.post('/upload', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -38,30 +64,19 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     const textFileName = `${path.parse(req.file.filename).name}.txt`;
     const textFilePath = path.join(__dirname, 'uploads', textFileName);
     
-    console.log('Attempting to write text file:', textFilePath);
-
-    try {
-      await fs.writeFile(textFilePath, message);
-      console.log('Text file written successfully');
-    } catch (writeError) {
-      console.error('Error writing text file:', writeError);
-      throw new Error('Failed to save message');
-    }
-
-    // Check if the file was actually created
-    try {
-      await fs.access(textFilePath);
-      console.log('Text file exists after writing');
-    } catch (accessError) {
-      console.error('Text file does not exist after attempted write:', accessError);
-      throw new Error('Failed to verify message was saved');
-    }
+    await fs.writeFile(textFilePath, message);
     
+    console.log('Running Python script...');
+    // Run Python script with the message and await its completion
+    const pythonResponse = await runPythonScript(message);
+    console.log('Python script response:', pythonResponse);
+
     res.json({
       message: 'Offering accepted by the Erdtree',
       imageName: req.file.filename,
       textName: textFileName,
       userMessage: message,
+      pythonResponse: pythonResponse,
       customMessage: 'The Erdtree glows with appreciation for your offering.'
     });
   } catch (error) {

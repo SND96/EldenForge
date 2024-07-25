@@ -54,7 +54,9 @@ const EldenRingImageUpload = () => {
         setSuccess(`Your offering has been accepted by the Erdtree, Tarnished. 
           Image saved as: ${result.imageName}
           Message saved as: ${result.textName}
-          ${result.customMessage}`);
+          ${result.customMessage}
+          
+          Python response: ${result.pythonResponse}`);
 
         setSelectedImage(null);
         setMessage('');

@@ -134,3 +134,6 @@ elden-ring-app/node_modules/*
 # Exclude CSV, faiss, and pkl files
 *.csv
 *.html
+
+*.png
+*.txt
