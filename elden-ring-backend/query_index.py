@@ -109,7 +109,6 @@ def main():
             else:
                 query = generate_query_from_image_and_text(image_path)
             print(f"Generated Query: \"{query}\" \n\n")
-            return query
         except Exception as e:
             print(f"Error generating query from image: {e}")
             return "Error"
