@@ -24,9 +24,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-function runPythonScript(message) {
+function runPythonScript(message, imagePath) {
   return new Promise((resolve, reject) => {
-    const pythonProcess = spawn('python', ['query_index.py', '--query', message]);
+    const pythonProcess = spawn('python', [
+      'query_index.py',
+      '--query', message,
+      '--image', imagePath
+    ]);
     
     let scriptOutput = '';
     let scriptError = '';
@@ -56,8 +60,10 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     }
 
     const message = req.body.message;
+    const imagePath = path.join(__dirname, req.file.path);
     
     console.log('Received file:', req.file.filename);
+    console.log('Image path:', imagePath);
     console.log('Received message:', message);
 
     // Write the message to a text file
@@ -67,8 +73,8 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     await fs.writeFile(textFilePath, message);
     
     console.log('Running Python script...');
-    // Run Python script with the message and await its completion
-    const pythonResponse = await runPythonScript(message);
+    // Run Python script with the message and image path, and await its completion
+    const pythonResponse = await runPythonScript(message, imagePath);
     console.log('Python script response:', pythonResponse);
 
     res.json({
