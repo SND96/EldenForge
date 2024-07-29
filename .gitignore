@@ -138,3 +138,6 @@ elden-ring-app/node_modules/*
 *.png
 *.jpg
 *.txt
+
+*/results.json
+*/top_results.json

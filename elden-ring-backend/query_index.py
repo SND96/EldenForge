@@ -6,8 +6,9 @@ import cohere
 from tenacity import retry, stop_after_attempt, wait_random_exponential, retry_if_exception_type
 
 # OpenAI API Key
-# OPENAI_API_KEY = 'sk-None-LvNsqypaMW2yIvPSA9R8T3BlbkFJte8SFRMxh2LNPAlg8ERs'
-OPENAI_API_KEY = 'sk-proj-2VVsetSPUZAR9jbBmTKoT3BlbkFJVd86BXtEzpRU133a8nEI'
+OPENAI_API_KEY = 'sk-None-LvNsqypaMW2yIvPSA9R8T3BlbkFJte8SFRMxh2LNPAlg8ERs'
+# OPENAI_API_KEY = 'sk-proj-2VVsetSPUZAR9jbBmTKoT3BlbkFJVd86BXtEzpRU133a8nEI'
+
 HEADERS = {
     "Authorization": f"Bearer {OPENAI_API_KEY}",
     "Content-Type": "application/json"
@@ -108,7 +109,7 @@ def main():
                 query = generate_query_from_image_and_text(image_path, query)
             else:
                 query = generate_query_from_image_and_text(image_path)
-            print(f"Generated Query: \"{query}\" \n\n")
+            # print(f"Generated Query: \"{query}\" \n\n")
         except Exception as e:
             print(f"Error generating query from image: {e}")
             return "Error"
@@ -144,7 +145,7 @@ def main():
             
             framed_question = query
             answer = submit_query_to_gpt4('top_results.json', framed_question)
-            print("\nGPT-4 Response:\n")
+            # print("\nGPT-4 Response:\n")
             print(answer)
             print('\n')
             return answer

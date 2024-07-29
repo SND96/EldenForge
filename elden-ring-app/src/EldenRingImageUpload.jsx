@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Shield, X } from 'lucide-react';
 import { Alert, AlertDescription } from './components/ui/alert';
 import { Button } from './components/ui/button';
+import { marked } from 'marked';
 
 const EldenRingImageUpload = () => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -51,12 +52,14 @@ const EldenRingImageUpload = () => {
         console.log('Offering accepted by the Erdtree:', result);
         
         setResponseData(result);
-        setSuccess(`Your offering has been accepted by the Erdtree, Tarnished. 
-          Image saved as: ${result.imageName}
-          Message saved as: ${result.textName}
-          ${result.customMessage}
-          
-          Python response: ${result.pythonResponse}`);
+        const renderedPythonResponse = marked.parse(result.pythonResponse);
+        setSuccess(<div>
+          <p>Your offering has been accepted by the Erdtree, Tarnished.</p>
+          <div 
+            className="markdown-content"
+            dangerouslySetInnerHTML={{ __html: renderedPythonResponse }}
+          />
+        </div>);
 
         setSelectedImage(null);
         setMessage('');
@@ -71,34 +74,57 @@ const EldenRingImageUpload = () => {
     }
   };
 
-
+  
   const styles = {
     container: {
-      maxWidth: '28rem',
-      margin: '0 auto',
-      padding: '2rem',
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
       background: 'linear-gradient(to bottom, #2d2411, #1a1306)',
-      borderRadius: '0.5rem',
-      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-      border: '2px solid #c7a767',
       fontFamily: 'Cinzel, serif',
-      color: '#e6d2a8'
+      color: '#e6d2a8',
+      padding: '2rem',
+      boxSizing: 'border-box',
+      overflowY: 'auto',
+    },
+    content: {
+      width: '100%',
+      maxWidth: '80rem',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
     },
     title: {
-      fontSize: '1.875rem',
-      marginBottom: '1.5rem',
+      fontSize: '2.5rem',
+      marginBottom: '2rem',
       textAlign: 'center',
       color: '#ffd700',
       fontWeight: 'bold'
     },
+    twoColumnLayout: {
+      display: 'flex',
+      width: '100%',
+      gap: '2rem',
+      flexWrap: 'wrap',
+    },
+    column: {
+      flex: '1 1 300px',
+      display: 'flex',
+      flexDirection: 'column',
+    },
     uploadArea: {
       display: 'flex',
       justifyContent: 'center',
-      padding: '1.5rem',
+      alignItems: 'center',
+      padding: '2rem',
       border: '2px solid #c7a767',
-      borderRadius: '0.375rem',
+      borderRadius: '0.5rem',
       backgroundColor: '#1c1609',
-      marginBottom: '1.5rem'
+      marginBottom: '2rem',
+      width: '100%',
     },
     uploadButton: {
       cursor: 'pointer',
@@ -108,22 +134,6 @@ const EldenRingImageUpload = () => {
       borderRadius: '0.375rem',
       fontWeight: 'bold',
       transition: 'background-color 0.3s ease',
-    },
-    uploadButtonHover: {
-      backgroundColor: '#c7a767'
-    },
-    offerButton: {
-      width: '100%',
-      backgroundColor: '#976f2d',
-      color: '#1c1609',
-      fontWeight: 'bold',
-      padding: '0.75rem 1rem',
-      borderRadius: '0.375rem',
-      marginTop: '1.5rem',
-      transition: 'background-color 0.3s ease',
-    },
-    offerButtonHover: {
-      backgroundColor: '#c7a767'
     },
     messageInput: {
       width: '100%',
@@ -135,79 +145,119 @@ const EldenRingImageUpload = () => {
       borderRadius: '0.375rem',
       fontFamily: 'Cinzel, serif',
       fontSize: '1rem',
-      outline: 'none',
-    }
+    },
+
+    offerButton: {
+      width: '100%',
+      backgroundColor: '#976f2d',
+      color: '#1c1609',
+      fontWeight: 'bold',
+      padding: '1rem',
+      borderRadius: '0.5rem',
+      marginTop: '2rem',
+      transition: 'background-color 0.3s ease',
+      fontSize: '1.1rem',
+    },
+    successMessage: {
+      marginTop: '1.5rem',
+      padding: '1rem',
+      backgroundColor: '#1c1609',
+      border: '1px solid #c7a767',
+      color: '#e6d2a8',
+      borderRadius: '0.5rem',
+      width: '100%',
+      overflowWrap: 'break-word',
+      wordWrap: 'break-word',
+      hyphens: 'auto',
+      textAlign: 'left',  
+    },
+    imagePreview: {
+      marginTop: '1.5rem',
+      position: 'relative',
+      width: '100%',
+    },
+    previewImage: {
+      maxWidth: '100%',
+      height: 'auto',
+      borderRadius: '0.5rem',
+      border: '2px solid #c7a767',
+    },
+    removeButton: {
+      position: 'absolute',
+      top: '0.5rem',
+      right: '0.5rem',
+      padding: '0.25rem',
+      backgroundColor: '#8b0000',
+      color: '#e6d2a8',
+      borderRadius: '9999px',
+      cursor: 'pointer',
+    },
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Choose a Remembrance to Offer</h2>
-      <div style={styles.uploadArea}>
-        <div>
-          <Shield color="#ffd700" size={64} />
-          <div style={{marginTop: '0.75rem', fontSize: '0.875rem'}}>
-            <label
-              htmlFor="image-upload"
-              style={styles.uploadButton}
+    <div className="elden-ring-theme" style={styles.container}>
+      <div style={styles.content}>
+        <h2 style={styles.title}>Choose a Remembrance to Offer</h2>
+        <div style={styles.twoColumnLayout}>
+          <div style={styles.column}>
+            <div style={styles.uploadArea}>
+              <div style={{textAlign: 'center'}}>
+                <Shield color="#ffd700" size={80} />
+                <div style={{marginTop: '1rem', fontSize: '1rem'}}>
+                  <label htmlFor="image-upload" style={styles.uploadButton}>
+                    <span>Upload a Remembrance</span>
+                    <input id="image-upload" name="image-upload" type="file" style={{display: 'none'}} onChange={handleImageChange} accept="image/*" />
+                  </label>
+                  <p style={{marginTop: '0.75rem'}}>or place it here</p>
+                </div>
+                <p style={{fontSize: '0.875rem', color: '#a89778', marginTop: '1rem'}}>Accepted offerings: PNG, JPG (up to 10MB)</p>
+              </div>
+            </div>
+
+            <input
+              type="text"
+              placeholder="Enter your message for the Erdtree..."
+              value={message}
+              onChange={handleMessageChange}
+              style={styles.messageInput}
+            />
+
+            <Button
+              onClick={handleUpload}
+              disabled={!selectedImage || !message || isUploading}
+              style={styles.offerButton}
             >
-              <span>Upload a Remembrance</span>
-              <input id="image-upload" name="image-upload" type="file" style={{display: 'none'}} onChange={handleImageChange} accept="image/*" />
-            </label>
-            <p style={{marginTop: '0.5rem'}}>or place it here</p>
+              {isUploading ? 'Offering to the Erdtree...' : 'Offer to the Erdtree'}
+            </Button>
+
+            {selectedImage && (
+              <div style={styles.imagePreview}>
+                <img src={URL.createObjectURL(selectedImage)} alt="Preview" style={styles.previewImage} />
+                <button onClick={() => setSelectedImage(null)} style={styles.removeButton}>
+                  <X size={16} />
+                </button>
+              </div>
+            )}
+
+            {error && (
+              <Alert variant="destructive" style={{marginTop: '1.5rem', backgroundColor: '#4f1c1c', border: '1px solid #8b0000', color: '#ffa799', width: '100%'}}>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
           </div>
-          <p style={{fontSize: '0.75rem', color: '#a89778', marginTop: '0.75rem'}}>Accepted offerings: PNG, JPG, GIF (up to 10MB)</p>
+
+          <div style={styles.column}>
+            {success && (
+              <div className="success-message" style={styles.successMessage}>
+                <h3>Offering Accepted</h3>
+                <div className="markdown-content">{success}</div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      <input
-        type="text"
-        placeholder="Enter your message for the Erdtree..."
-        value={message}
-        onChange={handleMessageChange}
-        style={styles.messageInput}
-      />
-
-      {error && (
-        <Alert variant="destructive" style={{marginBottom: '1rem', backgroundColor: '#4f1c1c', border: '1px solid #8b0000', color: '#ffa799'}}>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
-      {success && (
-        <div style={styles.successMessage}>
-          {success}
-        </div>
-      )}
-
-      {selectedImage && (
-        <div style={{marginTop: '1rem', position: 'relative'}}>
-          <img src={URL.createObjectURL(selectedImage)} alt="Preview" style={{maxWidth: '100%', height: 'auto', borderRadius: '0.5rem', border: '2px solid #c7a767'}} />
-          <button
-            onClick={() => setSelectedImage(null)}
-            style={{position: 'absolute', top: '0.5rem', right: '0.5rem', padding: '0.25rem', backgroundColor: '#8b0000', color: '#e6d2a8', borderRadius: '9999px'}}
-          >
-            <X size={16} />
-          </button>
-        </div>
-      )}
-
-      <Button
-        onClick={handleUpload}
-        disabled={!selectedImage || !message || isUploading}
-        style={styles.offerButton}
-      >
-        {isUploading ? 'Offering to the Erdtree...' : 'Offer to the Erdtree'}
-      </Button>
-
-      {responseData && (
-        <div style={styles.responseData}>
-          <h3>Response from the Erdtree:</h3>
-          <pre>{JSON.stringify(responseData, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 };
 
 export default EldenRingImageUpload;
-
