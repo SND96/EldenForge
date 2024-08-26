@@ -53,3 +53,8 @@ python server_launcher/launch_server.py
 ```
 
 Go to `http://localhost:3000/` to see the app.
+
+
+## App Screenshot
+
+![EldenForge Screenshot](images/elden_forge_example.png)
