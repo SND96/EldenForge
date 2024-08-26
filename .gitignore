@@ -141,3 +141,5 @@ elden-ring-app/node_modules/*
 
 */results.json
 */top_results.json
+
+.env

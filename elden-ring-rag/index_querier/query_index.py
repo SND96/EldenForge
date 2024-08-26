@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 import base64
@@ -5,13 +6,17 @@ import argparse
 import cohere
 from tenacity import retry, stop_after_attempt, wait_random_exponential, retry_if_exception_type
 
-# OpenAI API Key
-OPENAI_API_KEY = 'sk-None-LvNsqypaMW2yIvPSA9R8T3BlbkFJte8SFRMxh2LNPAlg8ERs'
+from dotenv import load_dotenv
+
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+COHERE_API_KEY = os.getenv('COHERE_API_KEY')
+
 HEADERS = {
     "Authorization": f"Bearer {OPENAI_API_KEY}",
     "Content-Type": "application/json"
 }
-COHERE_API_KEY = "h1XkPfFdekjbWlPdK8kTG1VFCy4gjBDDYpa5KpY2"
 
 class RateLimitError(Exception):
     pass
