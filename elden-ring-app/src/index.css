@@ -1,0 +1,55 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+
+/* @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap'); */
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+
+/* Elden Ring theme overrides */
+.elden-ring-theme {
+  font-family: 'Cinzel', serif;
+  color: #e6d2a8;
+  font-feature-settings: "smcp" on;
+}
+
+.elden-ring-theme h1,
+.elden-ring-theme h2,
+.elden-ring-theme h3,
+.elden-ring-theme h4,
+.elden-ring-theme h5,
+.elden-ring-theme h6 {
+  color: #ffd700;
+}
+
+/* Specific override for the success message */
+.elden-ring-theme .success-message {
+  font-family:  serif;
+  font-feature-settings: "smcp" off;
+  text-transform: none;
+}
+
+.elden-ring-theme .success-message h3 {
+  font-feature-settings: "smcp" on;
+}
+
+/* Ensure markdown content is not transformed */
+.elden-ring-theme .markdown-content,
+.elden-ring-theme .markdown-content * {
+  font-feature-settings: "smcp" off !important;
+  text-transform: none !important;
+}
